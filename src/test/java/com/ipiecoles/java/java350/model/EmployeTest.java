@@ -1,64 +1,79 @@
 package com.ipiecoles.java.java350.model;
 
-import org.junit.jupiter.api.Test;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 public class EmployeTest {
 
-    //Test methode GetNombreAnneeAnciennete
     @Test
-    public void testGetNombreAnneeAnciennete(){
+    public void testGetNbAnneesAncienneteDateEmbaucheNow(){
+        //Given
+        Employe employe = new Employe();
+        employe.setDateEmbauche(LocalDate.now());
+
+        //When
+        Integer nbAnneesAnciennete = employe.getNombreAnneeAnciennete();
+
+        //Then
+        Assertions.assertThat(nbAnneesAnciennete).isZero();
+
+    }
+
+    @Test
+    public void testGetNbAnneesAncienneteDateEmbauchePassee(){
+        //Given
         Employe employe = new Employe();
         employe.setDateEmbauche(LocalDate.now().minusYears(2));
 
-        Assertions.assertThat(2).isEqualTo(employe.getNombreAnneeAnciennete());
+        //When
+        Integer nbAnneesAnciennete = employe.getNombreAnneeAnciennete();
+
+        //Then
+        Assertions.assertThat(nbAnneesAnciennete).isEqualTo(2);
     }
 
     @Test
-    public void testGetNombreAnneeAncienneteNull(){
-        Employe employe = new Employe();
-
-        Assertions.assertThat(0).isEqualTo(employe.getNombreAnneeAnciennete());
-
-    }
-
-    @Test
-    public void testGetNombreAnneeAncienneteFuture(){
+    public void testGetNbAnneesAncienneteDateEmbaucheFuture(){
+        //Given
         Employe employe = new Employe();
         employe.setDateEmbauche(LocalDate.now().plusYears(2));
 
-        Assertions.assertThat(0).isEqualTo(employe.getNombreAnneeAnciennete());
+        //When
+        Integer nbAnneesAnciennete = employe.getNombreAnneeAnciennete();
 
+        //Then
+        Assertions.assertThat(nbAnneesAnciennete).isZero();
     }
 
     @Test
-    public void testGetNombreAnneeAnciennetePassee(){
+    public void testGetNbAnneesAncienneteDateEmbaucheNull(){
+        //Given
         Employe employe = new Employe();
-        employe.setDateEmbauche(LocalDate.now().minusYears(2));
+        employe.setDateEmbauche(null);
 
-        Assertions.assertThat(2).isEqualTo(employe.getNombreAnneeAnciennete());
+        //When
+        Integer nbAnneesAnciennete = employe.getNombreAnneeAnciennete();
 
+        //Then
+        Assertions.assertThat(nbAnneesAnciennete).isZero();
     }
-    ///////////////////////////////Fin GetNombreAnneeAnciennete////////////////////////////
-
-    //Test getNbConges/////////////////////////////////
-    @Test
-    public void testGetNbConges(){
-
-    }
-
-    ///////////////////////////////Fin getNbConges/////////////////////////////////
 
     @ParameterizedTest
     @CsvSource({
             "'M12345',0,1,1.0,1700.0",
+            "'M12345',2,1,1.0,1900.0",
+            "'M12345',0,1,1.0,1700.0",
+            ",0,1,1.0,1000.0",
             "'T12345',0,1,1.0,1000.0",
+            "'T12345',1,1,1.0,1100.0",
+            "'T12345',0,,1.0,1000.0",
             "'T12345',0,2,1.0,2300.0",
+            "'T12345',3,2,1.0,2600.0",
+            "'T12345',3,2,0.5,1300.0",
     })
     public void testGetPrimeAnnuelle(String matricule,
                                      Integer nbAnneesAnciennete,
@@ -68,9 +83,12 @@ public class EmployeTest {
         //Given
         Employe employe = new Employe("Doe", "John", matricule, LocalDate.now().minusYears(nbAnneesAnciennete),
                 2500d, performance, tauxTravail);
+
         //When
         Double prime = employe.getPrimeAnnuelle();
+
         //Then
         Assertions.assertThat(prime).isEqualTo(primeCalculee);
     }
+
 }
