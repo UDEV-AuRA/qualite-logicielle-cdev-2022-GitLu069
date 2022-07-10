@@ -1,4 +1,4 @@
-package com.ipiecoles.java.java350.model.service;
+package com.ipiecoles.java.java350.integration;
 
 import com.ipiecoles.java.java350.exception.EmployeException;
 import com.ipiecoles.java.java350.model.Employe;
@@ -16,7 +16,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.time.LocalDate;
 
 @SpringBootTest
-public class EmployeServiceTest {
+public class EmployeServiceIntegrationTest {
+
     @Autowired
     private EmployeService employeService;
 
@@ -25,13 +26,17 @@ public class EmployeServiceTest {
 
     @Test
     public void testEmbaucheEmploye() throws EmployeException {
+        //Given
 
-        employeService.embaucheEmploye("Doe","John", Poste.COMMERCIAL, NiveauEtude.MASTER,1.0);
+        //When
+        employeService.embaucheEmploye("Doe", "John",
+                Poste.COMMERCIAL, NiveauEtude.MASTER, 1.0);
 
+        //Then
         Employe employe = employeRepository.findByMatricule("C00001");
         Assertions.assertThat(employe).isNotNull();
-        Assertions.assertThat(employe.getNom()).isEqualTo("Doe");
         Assertions.assertThat(employe.getPrenom()).isEqualTo("John");
+        Assertions.assertThat(employe.getNom()).isEqualTo("Doe");
         Assertions.assertThat(employe.getMatricule()).isEqualTo("C00001");
         Assertions.assertThat(employe.getPerformance()).isEqualTo(1);
         Assertions.assertThat(employe.getTempsPartiel()).isEqualTo(1.0);

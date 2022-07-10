@@ -8,7 +8,7 @@ Exercices de Java, module 350 pour l'IPI. Il est nécessaire de forker ce reposi
 ou un autre IDE si vous avez l'habitude (Eclipse)
 - Si vous n'êtes pas familié avec Git, je vous recommande ce site : https://learngitbranching.js.org/ (faire au moins la première leçon du niveau 1)
 
-## Introduction
+## Introductio
 
 Questions à se poser : 
 - Que représente pour vous la qualité logicielle ?
