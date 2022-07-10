@@ -118,7 +118,7 @@ public class EmployeTest {
         });
 
         //Then
-        Assertions.assertThat(e).isInstanceOf(EmployeException.class).hasMessage("Aucun salaire est passé en paramètre");
+        Assertions.assertThat(e).isInstanceOf(EmployeException.class).hasMessage("Aucun salaire n'est passé en paramètre");
     }
 
     @Test

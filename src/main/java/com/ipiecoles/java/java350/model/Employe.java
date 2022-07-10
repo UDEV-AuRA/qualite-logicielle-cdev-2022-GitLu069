@@ -142,15 +142,9 @@ public class Employe {
     public void augmenterSalaire(double pourcentage) throws EmployeException {
         if (this.salaire != null)
             if (this.salaire < 0)
-                throw new EmployeException("Le salaire est négatif !");
-            else {
-                if (pourcentage > 100)
-                    throw new EmployeException("L'augmentation ne peut dépasser 100% !");
-                else
-                    this.salaire += this.salaire * (pourcentage / 100d);
-            }
+                throw new EmployeException("Le salaire entré est incorrect");
         else
-            throw new EmployeException("L'employé n'a pas de salaire !");
+            throw new EmployeException("Aucun salaire n'est passé en paramètre");
     }
 
     public Long getId() {
