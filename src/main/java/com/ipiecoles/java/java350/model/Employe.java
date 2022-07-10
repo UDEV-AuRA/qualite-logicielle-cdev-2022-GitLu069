@@ -1,5 +1,7 @@
 package com.ipiecoles.java.java350.model;
 
+import com.ipiecoles.java.java350.exception.EmployeException;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -48,7 +50,7 @@ public class Employe {
      * @return
      */
     public Integer getNombreAnneeAnciennete() {
-        if(dateEmbauche == null || dateEmbauche.isAfter(LocalDate.now())){
+        if (dateEmbauche == null || dateEmbauche.isAfter(LocalDate.now())){
             return 0;
         }
         return LocalDate.now().getYear() - dateEmbauche.getYear();
@@ -58,23 +60,41 @@ public class Employe {
         return Entreprise.NB_CONGES_BASE + this.getNombreAnneeAnciennete();
     }
 
-    public Integer getNbRtt(){
-        return getNbRtt(LocalDate.now());
-    }
-
-    public Integer getNbRtt(LocalDate d){
-        int i1 = d.isLeapYear() ? 365 : 366;int var = 104;
-        switch (LocalDate.of(d.getYear(),1,1).getDayOfWeek()){
-        case THURSDAY: if(d.isLeapYear()) var =  var + 1; break;
-        case FRIDAY:
-        if(d.isLeapYear()) var =  var + 2;
-        else var =  var + 1;
-case SATURDAY:var = var + 1;
-                    break;
+    /**
+     * Calcul du nombre de RTT pour une année
+     * Le nombre de RTT se calcule à partir de la formule suivante :
+     * Nombre de jours dans l'année
+     * - Nombre de jours travaillés dans l'année en plein temps
+     * - Nombre de samedi et dimanche dans l'année
+     * - Nombre de jours fériés ne tombant pas le week-end
+     * - Nombre de congés payés.
+     * Le tout au pro-rata du taux d'activité du salarié.
+     *
+     * @param date date pour laquelle calculer le nombre de RTT
+     *
+     * @return le nombre de RTT de l'employé
+     */
+    public Integer getNbRtt(LocalDate date){
+        int nbJourAnnee = date.isLeapYear() ? 366 : 365; //365
+        int nbJourWeekEnd = 104; //105
+        switch (LocalDate.of(date.getYear(), 1, 1).getDayOfWeek()) {
+            case THURSDAY:
+                if (date.isLeapYear())
+                    nbJourWeekEnd = nbJourWeekEnd + 1;
+                break;
+            case FRIDAY:
+                if (date.isLeapYear())
+                    nbJourWeekEnd = nbJourWeekEnd + 2;
+                else
+                    nbJourWeekEnd = nbJourWeekEnd + 1;
+                break;
+            case SATURDAY:
+                nbJourWeekEnd = nbJourWeekEnd + 1;
+                break;
         }
-        int monInt = (int) Entreprise.joursFeries(d).stream().filter(localDate ->
+        int nbJoursFerie = (int) Entreprise.joursFeries(date).stream().filter(localDate ->
                 localDate.getDayOfWeek().getValue() <= DayOfWeek.FRIDAY.getValue()).count();
-        return (int) Math.ceil((i1 - Entreprise.NB_JOURS_MAX_FORFAIT - var - Entreprise.NB_CONGES_BASE - monInt) * tempsPartiel);
+        return (int) Math.ceil((nbJourAnnee - Entreprise.NB_JOURS_MAX_FORFAIT - nbJourWeekEnd - Entreprise.NB_CONGES_BASE - nbJoursFerie) * tempsPartiel);
     }
 
     /**
@@ -112,8 +132,26 @@ case SATURDAY:var = var + 1;
         return prime * this.tempsPartiel;
     }
 
-    //Augmenter salaire
-    //public void augmenterSalaire(double pourcentage){}
+    /**
+     * Calcul de l'augmentation du salaire :
+     * Le pourcentage est compris entre 0 et 100 ( =! 0 et 1 )
+     * Le pourcentage ne peut être négatif
+     *
+     * @param pourcentage le pourcentage d'augmentation du salaire
+     */
+    public void augmenterSalaire(double pourcentage) throws EmployeException {
+        if (this.salaire != null)
+            if (this.salaire < 0)
+                throw new EmployeException("Le salaire est négatif !");
+            else {
+                if (pourcentage > 100)
+                    throw new EmployeException("L'augmentation ne peut dépasser 100% !");
+                else
+                    this.salaire += this.salaire * (pourcentage / 100d);
+            }
+        else
+            throw new EmployeException("L'employé n'a pas de salaire !");
+    }
 
     public Long getId() {
         return id;
@@ -231,16 +269,15 @@ case SATURDAY:var = var + 1;
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("Employe{");
-        sb.append("id=").append(id);
-        sb.append(", nom='").append(nom).append('\'');
-        sb.append(", prenom='").append(prenom).append('\'');
-        sb.append(", matricule='").append(matricule).append('\'');
-        sb.append(", dateEmbauche=").append(dateEmbauche);
-        sb.append(", salaire=").append(salaire);
-        sb.append(", performance=").append(performance);
-        sb.append(", tempsPartiel=").append(tempsPartiel);
-        sb.append('}');
-        return sb.toString();
+        return "Employe{" +
+                "id=" + id +
+                ", nom='" + nom + '\'' +
+                ", prenom='" + prenom + '\'' +
+                ", matricule='" + matricule + '\'' +
+                ", dateEmbauche=" + dateEmbauche +
+                ", salaire=" + salaire +
+                ", performance=" + performance +
+                ", tempsPartiel=" + tempsPartiel +
+                '}';
     }
 }
